@@ -5,11 +5,21 @@ require('./instructions');
 var Ingredient = mongoose.model('Ingredient').schema;
 var Instructions = mongoose.model('Instructions').schema;
 
-var IngredientListSchema = new Schema({
+var RecipeSchema = new Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    _id: String,
     serves: Number,
     ingredients: [Ingredient],
     instructions: Instructions,
     tags: [String]
 });
 
-module.exports = mongoose.model('IngredientList', IngredientListSchema);
+RecipeSchema.path('name').set(function (_name){
+    this._id = _name.replace(/\s+/g, '-').toLowerCase();
+    return _name;
+});
+
+module.exports = mongoose.model('Recipe', RecipeSchema);

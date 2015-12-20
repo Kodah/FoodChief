@@ -7,9 +7,9 @@ var mongoose = require('mongoose');
 var router = express.Router();
 var app = express();
 
-require('./models/IngredientList');
+require('./models/Recipe');
 
-var IngredientList = mongoose.model('IngredientList');
+var Recipe = mongoose.model('Recipe');
 var Ingredient = mongoose.model('Ingredient');
 var Instructions = mongoose.model('Instructions');
 
@@ -43,21 +43,22 @@ router.get('/', function(req, res) {
         steps : ["Pour Krave into bowl", "Pour milk into bowl"]
     });
 
-    var ingredientList = new IngredientList({
+    var recipe = new Recipe({
+        name: "bowl of krave",
         serves: 10,
         ingredients: [ingredient1, ingredient2],
         instructions: instructions
     });
 
-    console.log(ingredientList.instructions.readyIn);
+    console.log(recipe.instructions.readyIn);
 
-    // ingredientList.save(function(dberror) {
-    //     if (dberror) {
-    //         throw dberror;
-    //     } else {
-    //         console.log("Saved to db ", ingredientList);
-    //     }
-    // });
+    recipe.save(function(dberror) {
+        if (dberror) {
+            throw dberror;
+        } else {
+            console.log("Saved to db ", recipe);
+        }
+    });
 });
 
 app.use('/', router);
