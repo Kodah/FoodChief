@@ -11,6 +11,7 @@ require('./models/IngredientList');
 
 var IngredientList = mongoose.model('IngredientList');
 var Ingredient = mongoose.model('Ingredient');
+var Instructions = mongoose.model('Instructions');
 
 mongoose.connect('mongodb://localhost/DB_FoodChief');
 app.use(bodyParser.urlencoded({
@@ -31,23 +32,32 @@ router.get('/', function(req, res) {
     });
 
     var ingredient2 = new Ingredient({
-        name: "flour",
+        name: "Krave",
         quantity: "100g"
 
     });
 
-    var ingredientList = new IngredientList({
-        serves: 10,
-        ingredients: [ingredient1, ingredient2]
+    var instructions = new Instructions({
+        preperationTime: 30,
+        cookTime: 20,
+        steps : ["Pour Krave into bowl", "Pour milk into bowl"]
     });
 
-    ingredientList.save(function(dberror) {
-        if (dberror) {
-            throw dberror;
-        } else {
-            console.log("Saved to db");
-        }
+    var ingredientList = new IngredientList({
+        serves: 10,
+        ingredients: [ingredient1, ingredient2],
+        instructions: instructions
     });
+
+    console.log(ingredientList.instructions.readyIn);
+
+    // ingredientList.save(function(dberror) {
+    //     if (dberror) {
+    //         throw dberror;
+    //     } else {
+    //         console.log("Saved to db ", ingredientList);
+    //     }
+    // });
 });
 
 app.use('/', router);
