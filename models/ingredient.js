@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 var IngredientSchema = new Schema({
     name: {
         type: String,
-        required: false
+        required: true
     },
     quantity: {
         type: String,
