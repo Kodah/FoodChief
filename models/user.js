@@ -1,24 +1,38 @@
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema,
-    bcrypt = require('bcrypt'),
-    require('./recipe');
-    var Recipe = mongoose.model('Recipe').schema;
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+var bcrypt = require('bcrypt');
+require('./recipe');
+var Recipe = mongoose.model('Recipe').schema;
 
-    SALT_WORK_FACTOR = 10,
-    MAX_LOGIN_ATTEMPTS = 5,
-    LOCK_TIME = 60 * 5 * 1000; // 5 minute lock
+SALT_WORK_FACTOR = 10;
+MAX_LOGIN_ATTEMPTS = 5;
+LOCK_TIME = 60 * 5 * 1000; // 5 minute lock
 
 var UserSchema = new Schema({
-    username: { type: String, required: true, index: { unique: true } },
-    password: { type: String, required: true },
-    loginAttempts: { type: Number, required: true, default: 0 },
-    lockUntil: { type: Number },
+    username: {
+        type: String,
+        required: true,
+        index: {
+            unique: true
+        }
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    loginAttempts: {
+        type: Number,
+        required: true,
+        default: 0
+    },
+    lockUntil: {
+        type: Number
+    },
     staredRecipes: [Recipe],
     postedRecipes: [Recipe]
 });
 
-UserSchema.virtual('isLocked').get(function()
-{
+UserSchema.virtual('isLocked').get(function() {
     return !!(this.lockUntil && this.lockUntil > Date.now());
 });
 
@@ -30,7 +44,7 @@ UserSchema.pre('save', function(next) {
     bcrypt.genSalt(SALT_WORK_FACTOR, function(err, salt) {
         if (err) return next(err);
 
-        bcrypt.hash(user.password, salt, function (err, hash) {
+        bcrypt.hash(user.password, salt, function(err, hash) {
             if (err) return next(err);
             user.password = hash;
             next();
@@ -48,13 +62,23 @@ UserSchema.methods.comparePassword = function(candidatePassword, callBack) {
 UserSchema.methods.incLoginAttempts = function(callBack) {
     if (this.lockUntil && this.lockUntil < Date.now()) {
         return this.update({
-            $set: { loginAttempts: 1 },
-            $unset: { lockUntil: 1 }
+            $set: {
+                loginAttempts: 1
+            },
+            $unset: {
+                lockUntil: 1
+            }
         }, callBack);
     }
-    var updates = { $inc: { loginAttempts: 1 } };
+    var updates = {
+        $inc: {
+            loginAttempts: 1
+        }
+    };
     if (this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS && !this.isLocked) {
-        updates.$set = { lockUntil: Date.now() + LOCK_TIME };
+        updates.$set = {
+            lockUntil: Date.now() + LOCK_TIME
+        };
     }
     return this.update(updates, callBack);
 };
@@ -66,7 +90,9 @@ var reasons = UserSchema.statics.failedLogin = {
 };
 
 UserSchema.statics.getAuthenticated = function(username, password, callBack) {
-    this.findOne({ username: username }, function(err, user) {
+    this.findOne({
+        username: username
+    }, function(err, user) {
         if (err) return callBack(err);
 
         if (!user) {
@@ -85,8 +111,12 @@ UserSchema.statics.getAuthenticated = function(username, password, callBack) {
             if (isMatch) {
                 if (!user.loginAttempts && !user.lockUntil) return callBack(null, user);
                 var updates = {
-                    $set: { loginAttempts: 0 },
-                    $unset: { lockUntil: 1 }
+                    $set: {
+                        loginAttempts: 0
+                    },
+                    $unset: {
+                        lockUntil: 1
+                    }
                 };
                 return user.update(updates, function(err) {
                     if (err) return callBack(err);
@@ -100,3 +130,5 @@ UserSchema.statics.getAuthenticated = function(username, password, callBack) {
         });
     });
 };
+
+module.exports = mongoose.model('User', UserSchema);
