@@ -11,7 +11,9 @@ var Instructions = mongoose.model('Instructions');
 
 
 router.get('/', function(req, res, next) {
-    res.json('Recipe API');
+    Recipe.find({}).sort('date').exec(function(err, recipes) {
+        res.json(recipes);
+    });
 });
 
 router.post('/', function(req, res, next) {
@@ -19,6 +21,7 @@ router.post('/', function(req, res, next) {
     recipe.name = req.body.name;
     recipe.serves = req.body.serves;
     recipe.tags = req.body.tags;
+    recipe.date = Date.now();
     req.body.ingredients.forEach(function(_ingredient) {
         var ingredient = new Ingredient({
             name: _ingredient.name,
@@ -49,13 +52,35 @@ router.post('/', function(req, res, next) {
 router.get('/:recipeID', function(req, res, next) {
     Recipe.find({
         _id: req.params.recipeID
-    }).exec(function(err, matchups) {
+    }).exec(function(err, recipe) {
         if (err) throw err;
 
-        res.render('matchups', {
-            title: 'Matchups',
-            matchups: matchups
-        });
+        res.json(recipe);
+    });
+});
+
+router.put('/:recipeID', function(req, res) {
+    Recipe.findByIdAndUpdate(id, {
+        $set: {
+            size: 'large'
+        }
+    }, function(err, tank) {
+        if (err) return handleError(err);
+        res.send(tank);
+    });
+});
+
+router.delete('/:recipeID', function(req, res) {
+    Recipe.remove({
+        _id: req.params.recipeID
+    }).exec(function(err, recipe) {
+        if (err) {
+            throw err;
+        } else {
+            res.json({
+                "deleted": req.params.recipeID
+            });
+        }
     });
 });
 

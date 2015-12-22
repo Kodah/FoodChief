@@ -14,11 +14,13 @@ var RecipeSchema = new Schema({
     serves: Number,
     ingredients: [Ingredient],
     instructions: Instructions,
+    date : Date,
     tags: [String]
 });
 
 RecipeSchema.path('name').set(function (_name){
     this._id = _name.replace(/\s+/g, '-').toLowerCase();
+    //  + Math.floor(new Date() / 1000)
     return _name;
 });
 
