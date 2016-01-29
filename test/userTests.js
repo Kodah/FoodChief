@@ -13,6 +13,7 @@ describe("Users", function() {
         var user = new User();
         user.username = "Tom";
         user.password = "Password";
+        user.email = "tom@tom.com";
         user.save(function(err) {
             currentUser = user;
             done();
