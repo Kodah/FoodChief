@@ -73,4 +73,47 @@ describe("Users", function() {
         badAttempt(0);
 
     });
+
+    it("Modify user and make sure password doesnt get encrypted again", function(done) {
+        User.findOne({}, function(err, doc) {
+            doc.username = "Steven";
+            doc.save(function(err) {
+                expect(doc.username).to.be.equal("Steven");
+                done();
+            })
+        });
+    });
+
+    it("Check can log in when lock has expired", function(done) {
+        var ONE_HOUR = 60 * 60 * 1000;
+        User.findOne({}, function(err, doc) {
+            doc.loginAttempts = 10;
+            doc.lockUntil = Date.now() - ONE_HOUR;
+            doc.save(function(err) {
+                User.getAuthenticated("Tom", "Password", function(err, user, reason) {
+                    expect(user.loginAttempts).to.be.equal(0);
+                    done();
+                });
+            })
+        });
+    });
+
+    it("Check can login attempts reset when lock has expired", function(done) {
+        var ONE_HOUR = 60 * 60 * 1000;
+        User.findOne({}, function(err, doc) {
+            doc.loginAttempts = 10;
+            doc.lockUntil = Date.now() - ONE_HOUR;
+
+
+            doc.save(function(err) {
+                User.getAuthenticated("Tom", "WrongPassword", function(err, user, reason) {
+                    User.findOne({},function(err, doc) {
+                        expect(doc.loginAttempts).to.be.equal(1);
+                        done();
+                    });
+                });
+            })
+        });
+    });
+
 });

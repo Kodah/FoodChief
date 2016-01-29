@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
 var expect = require("chai").expect;
 var Recipe = require("../models/recipe");
+var mongoose = require('mongoose');
 
 describe("Recipes", function() {
     RECIPE_NAME = "Peanut butter jelly sandwich";
