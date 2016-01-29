@@ -12,7 +12,7 @@ router.get('/', function(req, res, next) {
     res.json('Registration Api');
 });
 
-router.post('/register', function(req, res, next) {
+router.post('/', function(req, res, next) {
     var user = new User();
     user.username = req.body.username;
     user.password = req.body.password;
