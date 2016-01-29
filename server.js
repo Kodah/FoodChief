@@ -9,7 +9,8 @@ var app = express();
 
 //Routes
 var recipeRoute = require('./routes/recipe');
-var authRoute = require('./routes/authentication');
+var registrationRoute = require('./routes/registration');
+var authenticationRoute = require('./routes/authentication');
 
 mongoose.connect('mongodb://localhost/DB_FoodChief');
 app.use(bodyParser.urlencoded({
@@ -31,6 +32,7 @@ router.get('/', function(req, res, next) {
 
 app.use('/', router);
 app.use('/recipe', recipeRoute);
-app.use('/auth', authRoute);
+app.use('/register', registrationRoute);
+app.use('/authenticate', authenticationRoute);
 
 app.listen(port);
