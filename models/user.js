@@ -1,7 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var bcrypt = require('bcrypt');
-require('./recipe');
 var Recipe = mongoose.model('Recipe').schema;
 
 SALT_WORK_FACTOR = 10;
@@ -11,12 +10,13 @@ LOCK_TIME = 60 * 5 * 1000; // 5 minute lock
 var UserSchema = new Schema({
     username: {
         type: String,
-        required: true,
-        index: {
-            unique: true
-        }
+        required: true
     },
     password: {
+        type: String,
+        required: true
+    },
+    email: {
         type: String,
         required: true
     },
@@ -131,4 +131,27 @@ UserSchema.statics.getAuthenticated = function(username, password, callBack) {
     });
 };
 
-module.exports = mongoose.model('User', UserSchema);
+User = mongoose.model('User', UserSchema);
+module.exports = User;
+
+User.schema.path('email').validate(function (value, respond) {                                                                                           
+    User.findOne({ email: value }, function (err, user) {                                                                                                
+        if(user) {
+            respond(false)
+        } else 
+        {
+            respond(true);
+        }                                                                                                                          
+    });                                                                                                                                                  
+}, 'This email address is already registered');
+
+User.schema.path('username').validate(function (value, respond) {                                                                                           
+    User.findOne({ username: value }, function (err, user) {                                                                                                
+        if(user) {
+            respond(false)
+        } else 
+        {
+            respond(true);
+        }                                                                                                                         
+    });                                                                                                                                                  
+}, 'This surname is already registered');
