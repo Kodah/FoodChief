@@ -33,6 +33,6 @@ router.get('/', function(req, res, next) {
 app.use('/', router);
 app.use('/recipe', recipeRoute);
 app.use('/register', registrationRoute);
-app.use('/authenticate', authenticationRoute);
+app.use('/authentication', authenticationRoute);
 
 app.listen(port);
