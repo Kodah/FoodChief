@@ -6,6 +6,10 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var router = express.Router();
 var app = express();
+var expressJWT = require('express-jwt');
+var jwt = require('jsonwebtoken');
+var config = require('./config/conf.js');
+
 
 //Routes
 var recipeRoute = require('./routes/recipe');
@@ -17,6 +21,10 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(bodyParser.json());
+app.use(expressJWT({secret: config.JWTSECRET}).unless({path: 
+	['/register', 
+	'/authentication',
+	]}));
 
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:9000');

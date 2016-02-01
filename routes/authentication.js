@@ -2,6 +2,8 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var router = express.Router();
+var jwt = require('jsonwebtoken');
+var config = require('../config/conf.js');
 
 //Models
 require('../models/User');
@@ -20,7 +22,8 @@ router.post('/', function(req, res, next) {
 
     User.getAuthenticated(username, password, function(err, user, reason) {
         if (!err) {
-            res.send("Login successful").status(200);
+            var token = jwt.sign({username : username}, config.JWTSECRET);
+            res.json(token).status(200);
         }
         else
         {
