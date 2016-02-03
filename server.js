@@ -27,7 +27,7 @@ app.use(expressJWT({secret: config.JWTSECRET}).unless(config.filterRoutes));
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:9000');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,authorization');
     res.setHeader('Access-Control-Allow-Credentials', true);
     next();
 });
@@ -37,7 +37,7 @@ router.get('/', function(req, res, next) {
 });
 
 app.use('/', router);
-app.use('/recipe', recipeRoute);
+app.use('/recipes', recipeRoute);
 app.use('/register', registrationRoute);
 app.use('/authentication', authenticationRoute);
 
