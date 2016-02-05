@@ -4,8 +4,10 @@ var mongoose = require('mongoose');
 var router = express.Router();
 
 //Models
+require('../models/User');
 require('../models/Recipe');
 var Recipe = mongoose.model('Recipe');
+var User = mongoose.model('User');
 var Ingredient = mongoose.model('Ingredient');
 var Instructions = mongoose.model('Instructions');
 
@@ -40,12 +42,14 @@ router.post('/', function(req, res, next) {
 
     recipe.instructions = instructions;
 
-    console.log(recipe.instructions.readyIn);
-
-    res.json(req.body);
 
     recipe.save(function(err) {
+        if (err) {throw err};
 
+        User.update({username : req.user.username}, { $push: { postedRecipes: recipe._id }}, function(err){
+            if (err) {res.status(500).send(err)};
+            res.status(200).send('saved');
+        });
     });
 });
 

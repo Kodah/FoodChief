@@ -1,7 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var bcrypt = require('bcrypt');
-var Recipe = mongoose.model('Recipe').schema;
 
 SALT_WORK_FACTOR = 10;
 MAX_LOGIN_ATTEMPTS = 5;
@@ -28,8 +27,8 @@ var UserSchema = new Schema({
     lockUntil: {
         type: Number
     },
-    staredRecipes: [Recipe],
-    postedRecipes: [Recipe]
+    staredRecipes: [],
+    postedRecipes: []
 });
 
 UserSchema.virtual('isLocked').get(function() {

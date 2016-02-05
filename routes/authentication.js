@@ -9,35 +9,37 @@ var config = require('../config/conf.js');
 require('../models/User');
 var User = mongoose.model('User');
 
+var reasons = ['User not found', 
+            'Password incorrect',
+            'Max attempts reached'
+            ];
 
 router.get('/', function(req, res, next) {
     res.json('Authentication Api');
 });
 
 router.post('/', function(req, res, next) {
-    
+
     var user = new User();
     username = req.body.username;
     password = req.body.password;
 
     User.getAuthenticated(username, password, function(err, user, reason) {
-        if (!err) {
+        if (!err && user) {
             var token = jwt.sign({
                 username : username}, 
                 config.JWTSECRET, 
                 {expiresIn: 60 * 60}
-            );
+                );
             res.json(token).status(200);
         }
         else
         {
-            res.status(reason).send(err); 
+            res.status(401).send(reasons[reason]); 
         }
 
-        });
+    });
 });
- 
-
 
 
 module.exports = router;
