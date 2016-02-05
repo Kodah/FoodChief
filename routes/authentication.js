@@ -22,7 +22,11 @@ router.post('/', function(req, res, next) {
 
     User.getAuthenticated(username, password, function(err, user, reason) {
         if (!err) {
-            var token = jwt.sign({username : username, expiresIn: '1h'}, config.JWTSECRET);
+            var token = jwt.sign({
+                username : username}, 
+                config.JWTSECRET, 
+                {expiresIn: 60 * 60}
+            );
             res.json(token).status(200);
         }
         else
