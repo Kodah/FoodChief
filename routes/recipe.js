@@ -11,13 +11,14 @@ var User = mongoose.model('User');
 var Ingredient = mongoose.model('Ingredient');
 var Instructions = mongoose.model('Instructions');
 
-
+//Get all recipes
 router.get('/', function(req, res, next) {
     Recipe.find({}).sort('date').exec(function(err, recipes) {
         res.json(recipes);
     });
 });
 
+//Post new recipe
 router.post('/', function(req, res, next) {
     var recipe = new Recipe();
     recipe.name = req.body.name;
@@ -44,15 +45,26 @@ router.post('/', function(req, res, next) {
 
 
     recipe.save(function(err) {
-        if (err) {throw err};
+        if (err) {
+            throw err
+        };
 
-        User.update({username : req.user.username}, { $push: { postedRecipes: recipe._id }}, function(err){
-            if (err) {res.status(500).send(err)};
+        User.update({
+            username: req.user.username
+        }, {
+            $push: {
+                postedRecipes: recipe._id
+            }
+        }, function(err) {
+            if (err) {
+                res.status(500).send(err)
+            };
             res.status(200).send('saved');
         });
     });
 });
 
+//Get recipe by ID
 router.get('/:recipeID', function(req, res, next) {
     Recipe.find({
         _id: req.params.recipeID
@@ -63,6 +75,38 @@ router.get('/:recipeID', function(req, res, next) {
     });
 });
 
+//Get recipe by searching name, ingredients and tag
+router.get('/find/:query?/', function(req, res, next) {
+    var regex = new RegExp(req.params.query, 'i');
+    var queryConditions = [{
+        $or: [{
+            'name': regex
+        }, {
+            'ingredients.name': regex
+        }]
+    }];
+
+    if (typeof req.query.tags != "undefined") {
+        var tags = [];
+        tags = req.query.tags.split(',');
+        queryConditions.add({
+            'tags': {
+                $in: tags
+            }
+        });
+    };
+    
+
+    Recipe.find({
+        $and: queryConditions
+    }).exec(function(err, docs) {
+        if (err) throw err;
+
+        res.json(docs);
+    });
+});
+
+//Update recipe
 router.put('/:recipeID', function(req, res) {
     Recipe.findByIdAndUpdate(id, {
         $set: {
