@@ -2,6 +2,8 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var router = express.Router();
+var jwt = require('jsonwebtoken');
+var config = require('../config/conf.js');
 
 //Models
 require('../models/User');
@@ -10,6 +12,7 @@ var Recipe = mongoose.model('Recipe');
 var User = mongoose.model('User');
 var Ingredient = mongoose.model('Ingredient');
 var Instructions = mongoose.model('Instructions');
+var Comment = mongoose.model('Comment');
 
 //Get all recipes
 router.get('/', function(req, res, next) {
@@ -25,6 +28,7 @@ router.post('/', function(req, res, next) {
     recipe.serves = req.body.serves;
     recipe.tags = req.body.tags;
     recipe.date = Date.now();
+    recipe.comments = [];
     req.body.ingredients.forEach(function(_ingredient) {
         var ingredient = new Ingredient({
             name: _ingredient.name,
@@ -95,7 +99,7 @@ router.get('/find/:query?/', function(req, res, next) {
             }
         });
     };
-    
+
 
     Recipe.find({
         $and: queryConditions
@@ -104,6 +108,46 @@ router.get('/find/:query?/', function(req, res, next) {
 
         res.json(docs);
     });
+});
+
+
+
+router.post('/comment/:recipeID', function(req, res, next) {
+    token = req.get("authorization").split(" ")[1];
+
+    var decoded = jwt.verify(token, config.JWTSECRET);
+    var username = decoded.username;
+
+    var comment = new Comment();
+    comment.date = Date.now();
+    comment.body = req.body.commentBody;
+    comment.rating = req.body.rating;
+    comment.user = username;
+
+    var conditions = {
+            _id: req.params.recipeID
+        },
+        update = {
+            $push: {
+                comments: comment
+            }
+        },
+        options = {
+            multi: false
+        };
+
+    Recipe.findOneAndUpdate(conditions, update, options, callback);
+
+    function callback(err, numAffected) {
+        if (err) {
+            res.json(err)
+        } else if (numAffected == null) {
+            res.json("Recipe doesnt exist");
+        } else {
+            res.json("Success");
+        };
+
+    };
 });
 
 //Update recipe

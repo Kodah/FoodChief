@@ -2,8 +2,10 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 require('./ingredient');
 require('./instructions');
+require('./comment');
 var Ingredient = mongoose.model('Ingredient').schema;
 var Instructions = mongoose.model('Instructions').schema;
+var Comment = mongoose.model('Comment').schema;
 
 var RecipeSchema = new Schema({
     name: {
@@ -15,6 +17,7 @@ var RecipeSchema = new Schema({
     ingredients: [Ingredient],
     instructions: Instructions,
     date : Date,
+    comments : [Comment],
     tags: [String]
 });
 

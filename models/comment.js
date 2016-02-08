@@ -1,18 +1,17 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-require('./user');
 var User = mongoose.model('User').schema;
 
 var CommentSchema = new Schema({
     user: {
-        type: User,
+        type: String,
         required: true
     },
     date: {
         type: Date,
         required: true
     },
-    comment: {
+    body: {
         type: String,
         required: true
     },
