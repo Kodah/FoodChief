@@ -18,7 +18,12 @@ var RecipeSchema = new Schema({
     instructions: Instructions,
     date : Date,
     comments : [Comment],
-    tags: [String]
+    tags: [String],
+    user: {
+        type: String,
+        required: true
+    },
+    image: String
 });
 
 RecipeSchema.path('name').set(function (_name){

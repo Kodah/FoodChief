@@ -29,6 +29,8 @@ router.post('/', function(req, res, next) {
     recipe.tags = req.body.tags;
     recipe.date = Date.now();
     recipe.comments = [];
+    recipe.user = getUsernameFromToken(req.get("authorization"));
+    recipe.image = req.body.image;
     req.body.ingredients.forEach(function(_ingredient) {
         var ingredient = new Ingredient({
             name: _ingredient.name,
@@ -110,13 +112,8 @@ router.get('/find/:query?/', function(req, res, next) {
     });
 });
 
-
-
 router.post('/comment/:recipeID', function(req, res, next) {
-    token = req.get("authorization").split(" ")[1];
-
-    var decoded = jwt.verify(token, config.JWTSECRET);
-    var username = decoded.username;
+    var username = getUsernameFromToken(req.get("authorization"));
 
     var comment = new Comment();
     comment.date = Date.now();
@@ -146,21 +143,54 @@ router.post('/comment/:recipeID', function(req, res, next) {
         } else {
             res.json("Success");
         };
-
     };
 });
 
 //Update recipe
 router.put('/:recipeID', function(req, res) {
-    Recipe.findByIdAndUpdate(id, {
-        $set: {
-            size: 'large'
+    var username = getUsernameFromToken(req.get("authorization"));
+
+    var ingredients = [];
+
+    req.body.ingredients.forEach(function(_ingredient) {
+        var ingredient = new Ingredient({
+            name: _ingredient.name,
+        });
+        if (_ingredient.quantity !== undefined) {
+            ingredient.quantity = _ingredient.quantity
         }
-    }, function(err, tank) {
-        if (err) return handleError(err);
-        res.send(tank);
+        ingredients.push(ingredient);
     });
+
+    var conditions = {
+            _id: req.params.recipeID,
+            user: username
+        },
+        update = {
+            "serves" : req.body.serves,
+            "$set" : {"instructions.preperationTime" : req.body.instructions.preperationTime},
+            "$set" : {"instructions.cookTime" : req.body.instructions.cookTime},
+            "$set" : {"instructions.steps" : req.body.instructions.steps},
+            "$set" : {"tags" : req.body.tags},
+            "$set" : {"ingredients" : ingredients}
+        },z
+        options = {
+            multi: false
+        };
+
+    Recipe.findOneAndUpdate(conditions, update, options, callback);
+    function callback(err, numAffected) {
+        if (err) {
+            res.json(err)
+        } else if (numAffected == null) {
+            res.json("Recipe doesnt exist");
+        } else {
+            res.json("Success");
+        };
+    };
+
 });
+
 
 router.delete('/:recipeID', function(req, res) {
     Recipe.remove({
@@ -176,44 +206,12 @@ router.delete('/:recipeID', function(req, res) {
     });
 });
 
-// router.get('/', function(req, res) {
-//     res.json({
-//         message: 'hooray! welcome to our api!'
-//     });
-//
-//     var ingredient1 = new Ingredient({
-//         name: "milk",
-//         quantity: "500 ml"
-//     });
-//
-//     var ingredient2 = new Ingredient({
-//         name: "Krave",
-//         quantity: "100g"
-//
-//     });
-//
-//     var instructions = new Instructions({
-//         preperationTime: 30,
-//         cookTime: 20,
-//         steps: ["Pour Krave into bowl", "Pour milk into bowl"]
-//     });
-//
-//     var recipe = new Recipe({
-//         name: "bowl of krave",
-//         serves: 10,
-//         ingredients: [ingredient1, ingredient2],
-//         instructions: instructions
-//     });
-//
-//     console.log(recipe.instructions.readyIn);
-//
-//     recipe.save(function(dberror) {
-//         if (dberror) {
-//             throw dberror;
-//         } else {
-//             console.log("Saved to db ", recipe);
-//         }
-//     });
-// });
+//helper functions
+function getUsernameFromToken(token) {
+
+    var decoded = jwt.verify(token.split(" ")[1], config.JWTSECRET);
+    return decoded.username;
+}
+
 
 module.exports = router;
