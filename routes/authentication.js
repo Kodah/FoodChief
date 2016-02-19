@@ -6,7 +6,6 @@ var jwt = require('jsonwebtoken');
 var config = require('../config/conf.js');
 
 //Models
-require('../models/User');
 var User = mongoose.model('User');
 
 var reasons = ['User not found', 

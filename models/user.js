@@ -2,7 +2,6 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var bcrypt = require('bcrypt');
 
-require('./shoppingList');
 var ShoppingList = mongoose.model('shoppingList').schema;
 
 SALT_WORK_FACTOR = 10;

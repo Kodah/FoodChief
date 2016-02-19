@@ -1,8 +1,8 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-require('./ingredient');
-require('./instructions');
-require('./comment');
+// require('./ingredient');
+// require('./instructions');
+// require('./comment');
 var Ingredient = mongoose.model('Ingredient').schema;
 var Instructions = mongoose.model('Instructions').schema;
 var Comment = mongoose.model('Comment').schema;

@@ -2,6 +2,8 @@ var expect = require("chai").expect;
 var User = require("../models/user");
 var mongoose = require('mongoose');
 
+require('../models/models.js').initialize();
+
 mongoose.connect('mongodb://localhost/DB_FoodChief_tests');
 
 describe("Users", function() {

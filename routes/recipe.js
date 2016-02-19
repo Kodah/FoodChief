@@ -6,7 +6,6 @@ var jwt = require('jsonwebtoken');
 var CONFIG = require('../config/conf.js');
 
 //Models
-require('../models/User');
 var Recipe = mongoose.model('Recipe');
 var User = mongoose.model('User');
 var Ingredient = mongoose.model('Ingredient');

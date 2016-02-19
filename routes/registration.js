@@ -4,8 +4,6 @@ var mongoose = require('mongoose');
 var router = express.Router();
 
 //Models
-require('../models/User');
-require('../models/shoppingList');
 var User = mongoose.model('User');
 var ShoppingList = mongoose.model('shoppingList');
 

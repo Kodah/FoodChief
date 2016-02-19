@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-require('../models/Recipe');
+// require('../models/Recipe');
 var Recipe = mongoose.model('Recipe');
 
 var ShoppingListSchema = new Schema({

@@ -9,6 +9,7 @@ var app = express();
 var expressJWT = require('express-jwt');
 var jwt = require('jsonwebtoken');
 var config = require('./config/conf.js');
+require('./models/models.js').initialize();
 
 
 //Routes

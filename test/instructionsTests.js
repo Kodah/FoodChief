@@ -2,6 +2,8 @@ var expect = require("chai").expect;
 var Instructions = require("../models/instructions");
 var mongoose = require('mongoose');
 
+require('../models/models.js').initialize();
+
 describe("Instructions", function() {
     beforeEach(function(done) {
         var instructions = new Instructions();

@@ -2,12 +2,15 @@ var expect = require("chai").expect;
 var Recipe = require("../models/recipe");
 var mongoose = require('mongoose');
 
+require('../models/models.js').initialize();
+
 describe("Recipes", function() {
     RECIPE_NAME = "Peanut butter jelly sandwich";
     EXPECTED_ID = "peanut-butter-jelly-sandwich"
     beforeEach(function(done) {
         var recipe = new Recipe();
         recipe.name = RECIPE_NAME;
+        recipe.user = "Santa";
         recipe.save(function(err) {
             done();
         });
