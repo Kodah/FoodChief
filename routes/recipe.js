@@ -52,7 +52,7 @@ router.post('/', function(req, res, next) {
 
     recipe.save(function(err) {
         if (err) {
-            throw err
+            res.json(err.message);
         };
 
         User.update({
@@ -63,9 +63,9 @@ router.post('/', function(req, res, next) {
             }
         }, function(err) {
             if (err) {
-                res.status(500).send(err)
+                res.json(err.message);
             };
-            res.status(200).send('saved');
+            res.json('saved');
         });
     });
 });

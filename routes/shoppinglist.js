@@ -11,20 +11,18 @@ var Recipe = mongoose.model('Recipe');
 
 router.put('/:recipeID', function(req, res) {
 
-    console.log("nigga");
     var username = CONFIG.getUserToken(req.get("authorization"));
-    Recipe.findOne({
+
+    Recipe.find({
         _id: req.params.recipeID
     }).exec(function(err, recipe) {
-        if (err) {
-            console.log(err.message);
-            res.json(err.message);
-        } else {
+        console.log(recipe);
+        if (recipe) {
             User.update({
                 username: req.user.username
             }, {
                 $push: {
-                    "shoppingList.recipes": recipe
+                    "shoppingList.recipeIds": req.params.recipeID
                 }
             }, function(err) {
                 if (err) {
@@ -33,12 +31,13 @@ router.put('/:recipeID', function(req, res) {
                     res.json("success");
                 };
             });
-        }
+        } else {
+            res.json("recipe not found");
+        };
     });
 });
 
 router.get('/', function(req, res) {
-    console.log("fuck");
     var username = CONFIG.getUserToken(req.get("authorization"));
     User.findOne({
         username: username
@@ -47,32 +46,43 @@ router.get('/', function(req, res) {
 
             res.json(err.message);
         } else {
-            res.json(user.shoppingList.getIngredients);
+
+            var callback = function(result) {
+                res.json(result);
+            }
+            user.shoppingList.set('getIngredients', callback);
+
         }
 
     });
 });
 
+
 router.delete('/:recipeID', function(req, res) {
+
     var username = CONFIG.getUserToken(req.get("authorization"));
 
-    User.find({
-        username: req.user.username
-    }, function(err, user) {
-        if (err) {
-            res.json(err.message);
-        } else {
-            console.log(user);
-            var shoppingList = user.shoppingList;
-            for (var i = 0; i < shoppingList.recipes.length; i++) {
-
-                if (recipes[i]._id === req.params.recipeID) {
-                    user.shoppingList.recipes.splice(i, i+1);
+    Recipe.find({
+        _id: req.params.recipeID
+    }).exec(function(err, recipe) {
+        console.log(recipe);
+        if (recipe) {
+            User.update({
+                username: req.user.username
+            }, {
+                $pull: {
+                    "shoppingList.recipeIds": req.params.recipeID
+                }
+            }, function(err) {
+                if (err) {
+                    res.json(err.message);
+                } else {
+                    res.json("success");
                 };
-            };
-            res.json("success");
+            });
+        } else {
+            res.json("recipe not found");
         };
     });
 });
-
 module.exports = router;

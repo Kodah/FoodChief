@@ -2,26 +2,51 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 require('../models/Recipe');
-var Recipe = mongoose.model('Recipe').schema;
+var Recipe = mongoose.model('Recipe');
 
 var ShoppingListSchema = new Schema({
 
-    recipes: [Recipe]
+    recipeIds: []
 });
 
 
-ShoppingListSchema.virtual('getIngredients').get(function() {
-    var ingredientList = [];
+function getIngredientData(recipeIds, callback) {
 
-    this.recipes.forEach(function(recipe) {
-        console.log(recipe.name);
-        recipe.ingredients.forEach(function(ingredient) {
-            ingredient._id = undefined;
-            ingredientList.push(ingredient);
+    Recipe.find({
+        _id: {
+            $in: recipeIds
+        }
+    }, {
+        _id: 0
+    }).exec(function(err, recipes) {
+        var counter = [];
+        var ingredientList = [];
+
+
+        console.log(recipes.length);
+
+        recipes.forEach(function(recipe) {
+
+            recipe.ingredients.forEach(function(ingredient) {
+
+                ingredientList.push(ingredient);
+            });
+
+            counter.push(true);
+
         });
-    });
+        if (counter.length == recipes.length) {
+            callback(ingredientList);
 
-    return ingredientList;
+        };
+
+    });
+}
+
+ShoppingListSchema.virtual('getIngredients').set(function(callback) {
+    getIngredientData(this.recipeIds, callback);
 });
+
+
 
 module.exports = mongoose.model('shoppingList', ShoppingListSchema);
