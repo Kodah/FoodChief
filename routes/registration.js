@@ -5,7 +5,9 @@ var router = express.Router();
 
 //Models
 require('../models/User');
+require('../models/shoppingList');
 var User = mongoose.model('User');
+var ShoppingList = mongoose.model('shoppingList');
 
 
 router.get('/', function(req, res, next) {
@@ -17,6 +19,10 @@ router.post('/', function(req, res, next) {
     user.username = req.body.username;
     user.password = req.body.password;
     user.email = req.body.email;
+    user.staredRecipes = [];
+    user.postedRecipes = [];
+    user.shoppingList = new ShoppingList();
+    
 
     user.save(function(err) {
 

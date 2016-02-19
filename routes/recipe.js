@@ -7,12 +7,12 @@ var config = require('../config/conf.js');
 
 //Models
 require('../models/User');
-require('../models/Recipe');
 var Recipe = mongoose.model('Recipe');
 var User = mongoose.model('User');
 var Ingredient = mongoose.model('Ingredient');
 var Instructions = mongoose.model('Instructions');
 var Comment = mongoose.model('Comment');
+var ShoppingList = mongoose.model('shoppingList');
 
 //Get all recipes
 router.get('/', function(req, res, next) {
@@ -167,18 +167,30 @@ router.put('/:recipeID', function(req, res) {
             user: username
         },
         update = {
-            "serves" : req.body.serves,
-            "$set" : {"instructions.preperationTime" : req.body.instructions.preperationTime},
-            "$set" : {"instructions.cookTime" : req.body.instructions.cookTime},
-            "$set" : {"instructions.steps" : req.body.instructions.steps},
-            "$set" : {"tags" : req.body.tags},
-            "$set" : {"ingredients" : ingredients}
-        },z
-        options = {
-            multi: false
-        };
+            "serves": req.body.serves,
+            "$set": {
+                "instructions.preperationTime": req.body.instructions.preperationTime
+            },
+            "$set": {
+                "instructions.cookTime": req.body.instructions.cookTime
+            },
+            "$set": {
+                "instructions.steps": req.body.instructions.steps
+            },
+            "$set": {
+                "tags": req.body.tags
+            },
+            "$set": {
+                "ingredients": ingredients
+            }
+        },
+        z
+    options = {
+        multi: false
+    };
 
     Recipe.findOneAndUpdate(conditions, update, options, callback);
+
     function callback(err, numAffected) {
         if (err) {
             res.json(err)
@@ -190,6 +202,37 @@ router.put('/:recipeID', function(req, res) {
     };
 
 });
+
+
+router.put('/shoppinglist/:recipeID', function(req, res) {
+    var username = getUsernameFromToken(req.get("authorization"));
+    Recipe.findOne({
+        _id: req.params.recipeID
+    }).exec(function(err, recipe) {
+        if (err) {
+            console.log(err.message);
+            res.json(err.message);
+        } else {
+            User.update({
+                username: req.user.username
+            }, {
+                $push: {
+                    "shoppingList.recipes": recipe
+                }
+            }, function(err) {
+                if (err) {
+                    res.json(err.message);
+                } else {
+                    res.json("success");
+                };
+
+            });
+        }
+    });
+});
+
+
+
 
 
 router.delete('/:recipeID', function(req, res) {
@@ -208,7 +251,6 @@ router.delete('/:recipeID', function(req, res) {
 
 //helper functions
 function getUsernameFromToken(token) {
-
     var decoded = jwt.verify(token.split(" ")[1], config.JWTSECRET);
     return decoded.username;
 }

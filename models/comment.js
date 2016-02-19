@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var User = mongoose.model('User').schema;
 
 var CommentSchema = new Schema({
     user: {

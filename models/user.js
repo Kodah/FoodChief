@@ -2,6 +2,9 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 var bcrypt = require('bcrypt');
 
+require('./shoppingList');
+var ShoppingList = mongoose.model('shoppingList').schema;
+
 SALT_WORK_FACTOR = 10;
 MAX_LOGIN_ATTEMPTS = 5;
 LOCK_TIME = 60 * 5 * 1000; // 5 minute lock
@@ -28,7 +31,8 @@ var UserSchema = new Schema({
         type: Number
     },
     staredRecipes: [],
-    postedRecipes: []
+    postedRecipes: [],
+    shoppingList: ShoppingList 
 });
 
 UserSchema.virtual('isLocked').get(function() {
