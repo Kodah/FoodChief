@@ -15,6 +15,7 @@ var config = require('./config/conf.js');
 var recipeRoute = require('./routes/recipe');
 var registrationRoute = require('./routes/registration');
 var authenticationRoute = require('./routes/authentication');
+var shoppinglistRoute = require('./routes/shoppinglist');
 
 mongoose.connect('mongodb://localhost/DB_FoodChief');
 app.use(bodyParser.urlencoded({
@@ -40,5 +41,6 @@ app.use('/', router);
 app.use('/recipes', recipeRoute);
 app.use('/register', registrationRoute);
 app.use('/authentication', authenticationRoute);
+app.use('/shoppinglist', shoppinglistRoute);
 
 app.listen(port);

@@ -4,22 +4,24 @@ var Schema = mongoose.Schema;
 require('../models/Recipe');
 var Recipe = mongoose.model('Recipe').schema;
 
-var shoppingListSchema = new Schema({
+var ShoppingListSchema = new Schema({
 
-    recipes : [Recipe]
+    recipes: [Recipe]
 });
 
-shoppingListSchema.virtual('shoppingList').get(function() {
 
-	var shoppingList = [];
+ShoppingListSchema.virtual('getIngredients').get(function() {
+    var ingredientList = [];
 
-	this.recipes.forEach(function (recipe) {
-		recipe.ingredients.forEach(function (ingredient) {
-			shoppingList.push(ingredient);
-		});
-	});
+    this.recipes.forEach(function(recipe) {
+        console.log(recipe.name);
+        recipe.ingredients.forEach(function(ingredient) {
+            ingredient._id = undefined;
+            ingredientList.push(ingredient);
+        });
+    });
 
-    return shoppingList;
+    return ingredientList;
 });
 
-module.exports = mongoose.model('shoppingList', shoppingListSchema);
+module.exports = mongoose.model('shoppingList', ShoppingListSchema);

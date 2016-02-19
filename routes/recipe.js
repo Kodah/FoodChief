@@ -3,7 +3,7 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var router = express.Router();
 var jwt = require('jsonwebtoken');
-var config = require('../config/conf.js');
+var CONFIG = require('../config/conf.js');
 
 //Models
 require('../models/User');
@@ -29,7 +29,7 @@ router.post('/', function(req, res, next) {
     recipe.tags = req.body.tags;
     recipe.date = Date.now();
     recipe.comments = [];
-    recipe.user = getUsernameFromToken(req.get("authorization"));
+    recipe.user = CONFIG.getUserToken(req.get("authorization"));
     recipe.image = req.body.image;
     req.body.ingredients.forEach(function(_ingredient) {
         var ingredient = new Ingredient({
@@ -113,7 +113,7 @@ router.get('/find/:query?/', function(req, res, next) {
 });
 
 router.post('/comment/:recipeID', function(req, res, next) {
-    var username = getUsernameFromToken(req.get("authorization"));
+    var username = CONFIG.getUserToken(req.get("authorization"));
 
     var comment = new Comment();
     comment.date = Date.now();
@@ -148,7 +148,7 @@ router.post('/comment/:recipeID', function(req, res, next) {
 
 //Update recipe
 router.put('/:recipeID', function(req, res) {
-    var username = getUsernameFromToken(req.get("authorization"));
+    var username = CONFIG.getUserToken(req.get("authorization"));
 
     var ingredients = [];
 
@@ -204,37 +204,6 @@ router.put('/:recipeID', function(req, res) {
 });
 
 
-router.put('/shoppinglist/:recipeID', function(req, res) {
-    var username = getUsernameFromToken(req.get("authorization"));
-    Recipe.findOne({
-        _id: req.params.recipeID
-    }).exec(function(err, recipe) {
-        if (err) {
-            console.log(err.message);
-            res.json(err.message);
-        } else {
-            User.update({
-                username: req.user.username
-            }, {
-                $push: {
-                    "shoppingList.recipes": recipe
-                }
-            }, function(err) {
-                if (err) {
-                    res.json(err.message);
-                } else {
-                    res.json("success");
-                };
-
-            });
-        }
-    });
-});
-
-
-
-
-
 router.delete('/:recipeID', function(req, res) {
     Recipe.remove({
         _id: req.params.recipeID
@@ -249,11 +218,7 @@ router.delete('/:recipeID', function(req, res) {
     });
 });
 
-//helper functions
-function getUsernameFromToken(token) {
-    var decoded = jwt.verify(token.split(" ")[1], config.JWTSECRET);
-    return decoded.username;
-}
+
 
 
 module.exports = router;

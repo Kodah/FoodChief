@@ -1,3 +1,4 @@
+var jwt = require('jsonwebtoken');
 
 var config = {};
 
@@ -15,5 +16,9 @@ config.filterRoutes = function(req)
     return false;
 }
 
+config.getUserToken = function (token) {
+    var decoded = jwt.verify(token.split(" ")[1], config.JWTSECRET);
+    return decoded.username;
+}
 
 module.exports = config;
